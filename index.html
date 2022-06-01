@@ -12,28 +12,141 @@
         h1 {
             color: #0B3954;
         }
+        .button-disabled {
+            color: greenyellow;
+            background-color: grey;
+            width: 150px;
+            height: 150px;
+            margin-outside: 20pk;
+            font-weight: bolder;
+            font-size: large;
+        }
+        .button-enabled {
+            color: orangered;
+            background-color: lawngreen;
+            width: 150px;
+            height: 150px;
+            font-weight: bolder;
+            font-size: large;
+        }
+        .menu {
+            padding-left: 150px;
+        }
     </style>
 </head>
 <body>
 <div id="app">
-    <h1 id="main-header">Moja aplikacja</h1>
-    <p>To będzie gra. A oto co muszę zrobić:</p>
-    <ol>
-        <li class="boring">Nauczyć się HTML</li>
-        <li class="boring">Nauczyć się CSS</li>
-        <li>Nauczyć się JS</li>
-        <li id="super-important">Zaimplementować</li>
-    </ol>
-	<button type="button" onclick="removeBoringStuff()">Usuń nudne rzeczy</button>
-	<input type="text" id="myTextField">
-<input type="checkbox" id="myCheckbox">
-<button type="button" onclick="readValues()">Odczytaj wartości</button>
+<h1> Witaj w refleksomierzu 2000!</h1>
+    <h2>Zadaniem użytkownika jest jak najszybsze kliknięcie obszaru po zmianie koloru.</h2>
+    <h2 id="status">Status gry: Rozpocznij grę!</h2>
 </div>
+<div id="menu" class="menu">
+    <button onclick="start()" id="startB" class="button-enabled">START GAME</button>
+    <button onclick="stop()" id="stopB" class="button-disabled" disabled="true">STOP GAME</button>
+</div>
+<div id="wyniki"></div>
 <script>
-function readValues() {
-		const textFromField = document.getElementById('myTextField');
-	alert(textFromField.value);
+let game = document.createElement('div');
+let gamePlay = false;
+var buttonNum = 0;
+var click = false;
+var wyniki = [];
+var startTime;
+var stopTime;
+var counter = 0;
+
+for (let i = 0; i < 5; i++) {
+    var button = document.createElement('button');
+    button.setAttribute('id', i);
+    button.setAttribute('disabled', 'true');
+    button.setAttribute('class', 'button-disabled')
+    button.setAttribute("onclick","clicks()")
+    game.append(button);
 }
+document.getElementById('app').append(game);
+
+function clicks() {
+    if (counter < 5) {
+        counter += 1;
+        console.log(counter);
+
+        console.log(counter);
+        var now = new Date();
+        stopTime = now.getTime();
+        wyniki.push(stopTime-startTime);
+        document.getElementById(buttonNum).disabled = true;
+        document.getElementById(buttonNum).setAttribute("class", "button-disabled");
+        if (counter > 0) {
+            document.getElementById("wyniki").textContent ='';
+            viewResults();
+        }
+        gameRunner();
+    }
+    if (counter == 5) {
+        stop();
+    }
+
+}
+function start(){
+    gamePlay = true;
+    document.getElementById("startB").disabled = true;
+    document.getElementById("startB").setAttribute("class", "button-disabled");
+    document.getElementById("stopB").disabled = false;
+    document.getElementById("stopB").setAttribute("class", "button-enabled");
+    document.getElementById("wyniki").textContent ='';
+    gameRunner();
+}
+
+function viewResults() {
+    var bestTime = document.createElement('h3');
+    var worstTime = document.createElement('h3');
+    var meanTime = document.createElement('h3');
+
+    if (wyniki.length > 0) {
+        const avg = calculateAverage(wyniki)
+        bestTime.innerText = "Najlepszsy czas: " + Math.min.apply(Math, wyniki) + "ms";
+        worstTime.innerText = "Najgorszy czas: " + Math.max.apply(Math, wyniki) + "ms";
+        meanTime.innerText = "Średni czas: " + avg + "ms";
+        document.getElementById("wyniki").append(bestTime);
+        document.getElementById("wyniki").append(worstTime);
+        document.getElementById("wyniki").append(meanTime);
+    }
+}
+
+function stop() {
+    this.counter = 0;
+    wyniki = [];
+    document.getElementById("startB").disabled = false;
+    document.getElementById("startB").setAttribute("class", "button-enabled");
+    document.getElementById("stopB").disabled = true;
+    document.getElementById("stopB").setAttribute("class", "button-disabled");
+    document.getElementById("status").textContent = "Koniec Pomiaru!"
+    document.getElementById(buttonNum).disabled = true;
+    document.getElementById(buttonNum).setAttribute("class", "button-disabled");
+    gamePlay = false;
+}
+function gameRunner() {
+    document.getElementById("status").textContent = "Pomiar refleksu w toku!"
+    buttonNum = Math.floor(Math.random() * (5));
+    document.getElementById(buttonNum).disabled = false;
+    document.getElementById(buttonNum).setAttribute("class", "button-enabled");
+    var now = new Date();
+    startTime = now.getTime();
+}
+
+function calculateAverage(array) {
+    var total = 0;
+    var count = 0;
+
+    array.forEach(function(item, index) {
+        total += item;
+        count++;
+    });
+
+    return total / count;
+}
+
+
 </script>
 </body>
 </html>
